@@ -35,8 +35,8 @@ export class BlogsController {
 
   @UseGuards(AuthGuard('jwt'))
   @Delete(':id')
-  removeBlog(@Param('id') id: string, @Request() req: any) {
-    return this.blogService.removeBlog(id, req);
+  removeBlog(@Body() dto: BlogDto, @Param('id') id: string) {
+    return this.blogService.removeBlog(dto, id);
   }
 
   @Get()

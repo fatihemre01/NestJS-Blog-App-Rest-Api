@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, UnauthorizedException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { User, UserDocument } from 'src/auth/schemas/user.schema';
@@ -24,10 +24,18 @@ export class BlogsService {
   }
 
   async updateBlog(id: string, dto: BlogDto, req: any) {
+    const blog = await this.blogModel.findById(id);
+    if (dto.userId !== blog.userId) {
+      throw new UnauthorizedException('This is not your blog!');
+    }
     return await this.blogModel.findByIdAndUpdate(id, dto, { new: true });
   }
 
-  async removeBlog(id: string, req: any) {
+  async removeBlog(dto: BlogDto, id: string) {
+    const blog = await this.blogModel.findById(id);
+    if (dto.userId !== blog.userId) {
+      throw new UnauthorizedException('This is not your blog!');
+    }
     return await this.blogModel.findByIdAndRemove(id);
   }
 
