@@ -1,4 +1,5 @@
 import { Module } from '@nestjs/common';
+import { ConfigService } from '@nestjs/config';
 import { JwtModule } from '@nestjs/jwt';
 import { MongooseModule } from '@nestjs/mongoose';
 import { jwtSecret } from 'src/auth/config/auth.keys';
@@ -10,9 +11,11 @@ import { JwtStrategy } from './strategy/jwt.strategy';
 @Module({
   imports: [
     MongooseModule.forFeature([{ name: User.name, schema: UserSchema }]),
-    JwtModule.register({
-      secret: jwtSecret.secret,
-      signOptions: { expiresIn: '10m' },
+    JwtModule.registerAsync({
+      inject: [ConfigService],
+      useFactory: async (configService: ConfigService) => ({
+        secret: configService.get('jwtSecret'),
+      }),
     }),
   ],
   controllers: [AuthController],
